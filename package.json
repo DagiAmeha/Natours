@@ -1,0 +1,17 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "an application that user will purchase tour",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Dagim Ameha",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.13.0",
+    "validator": "^13.15.0"
+  }
+}
