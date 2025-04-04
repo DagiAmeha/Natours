@@ -11,4 +11,12 @@ app.use(express.static('public'));
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 
+// handling Route that are not defined in our api
+app.all('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+  });
+});
+
 module.exports = app;
