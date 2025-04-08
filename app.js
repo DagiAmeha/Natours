@@ -4,9 +4,11 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const morgan = require('morgan');
 
 const tourRoute = require('./routes/tourRoute');
 const userRoute = require('./routes/userRoute');
+const { globalErrorHandler } = require('./controllers/errorController');
 
 const app = express();
 
@@ -56,11 +58,11 @@ app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 
 // handling Route that are not defined in our api
-app.all('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-  });
+app.all('*', (req, res, next) => {
+  next(new AppError(`This path ${req.originalUrl} isn't on this server!`, 404));
 });
+
+// Use the global error handler
+app.use(globalErrorHandler);
 
 module.exports = app;

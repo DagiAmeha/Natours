@@ -1,4 +1,5 @@
 const Tour = require('../model/tourModel');
+const AppError = require('../utils/AppError');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -55,7 +56,7 @@ exports.getAllTours = async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 exports.getTour = async (req, res, next) => {
@@ -63,9 +64,13 @@ exports.getTour = async (req, res, next) => {
     const tour = await Tour.find({ id: req.params.id });
 
     if (tour.length === 0)
-      throw new Error(
-        `Inalid Id: there is no tour with an Id "${req.params.id}"`
+      next(
+        new AppError(
+          `Inalid Id: there is no tour with an Id "${req.params.id}`,
+          400
+        )
       );
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -73,10 +78,7 @@ exports.getTour = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: `Inalid Id: there is no tour with an Id ${req.params.id}`,
-    });
+    next(err);
   }
 };
 exports.createNewTour = async (req, res, next) => {
@@ -89,10 +91,7 @@ exports.createNewTour = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message,
-    });
+    next(err);
   }
 };
 exports.updateTour = async (req, res, next) => {
@@ -113,10 +112,11 @@ exports.updateTour = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: `Inalid Id: there is no tour with an Id ${req.params.id}`,
-    });
+    next(err);
+    // res.status(400).json({
+    //   status: 'fail',
+    //   message: `Inalid Id: there is no tour with an Id ${req.params.id}`,
+    // });
   }
 };
 exports.deleteTour = async (req, res, next) => {
@@ -127,10 +127,7 @@ exports.deleteTour = async (req, res, next) => {
       data: null,
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: `Inalid Id: there is no tour with an Id ${req.params.id}`,
-    });
+    next(err);
   }
 };
 
@@ -163,10 +160,7 @@ exports.tourStats = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'error',
-      message: err.message,
-    });
+    next(err);
   }
 };
 
@@ -215,9 +209,6 @@ exports.getMonthlyPlan = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      message: err.message,
-    });
+    next(err);
   }
 };
