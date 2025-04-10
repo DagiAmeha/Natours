@@ -1,11 +1,24 @@
 const AppError = require('../utils/AppError');
 
 const validationErrorHandler = (error) => {
-  const errors = Object.values(error.errors).map((el) => el.message);
-  error.statusCode = 400;
+  const errors = Object.values(error.errors)
+    .map((el) => el.message)
+    .join('. ');
 
-  return new AppError(errors, error.statusCode);
+  return new AppError(errors, 400);
 };
+
+const duplicateErrorHandler = (error) => {
+  const message = `Duplcate name for a tour in not allowed /${error.keyValue.name}/`;
+
+  return new AppError(message, 400);
+};
+
+const castErrorHandler = (err) => {
+  const message = `Invalid ${err.path}: ${err.value}.`;
+  return new AppError(message, 400);
+};
+
 //Error Handler For Production Environment
 const prodError = (err, res) => {
   if (err.isOperational) {
@@ -43,6 +56,8 @@ exports.globalErrorHandler = (err, req, res, next) => {
     let error = JSON.parse(JSON.stringify(err));
 
     if (err.name === 'ValidationError') error = validationErrorHandler(error);
+    if (err.code === 11000) error = duplicateErrorHandler(error);
+    if (err.name === 'CastError') error = castErrorHandler(error);
 
     prodError(error, res);
   }

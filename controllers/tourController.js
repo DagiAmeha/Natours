@@ -61,7 +61,7 @@ exports.getAllTours = async (req, res, next) => {
 };
 exports.getTour = async (req, res, next) => {
   try {
-    const tour = await Tour.find({ id: req.params.id });
+    const tour = await Tour.find({ _id: req.params.id });
 
     if (tour.length === 0)
       next(
