@@ -33,9 +33,14 @@ const userSchema = new mongoose.Schema({
       message: 'the password you provided is different with the password',
     },
   },
+  passwordChangedAt: Date,
   image: String,
 });
 
+userSchema.methods.changedPasswordAfter = (tokenInitiatedAt) => {
+  if (this.passwordChangedAt > tokenInitiatedAt) return true;
+  return false;
+};
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(this.password, candidatePassword);
 };
