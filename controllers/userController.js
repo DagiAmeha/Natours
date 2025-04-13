@@ -1,5 +1,8 @@
 const User = require('../model/tourModel');
 
+exports.updateMe = (req, res, next) => {};
+exports.deleteMe = (req, res, next) => {};
+
 exports.getAllUsers = async (req, res, next) => {
   res.status(500).json({
     statsu: 'error',

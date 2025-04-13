@@ -30,24 +30,38 @@ const userSchema = new mongoose.Schema({
       validator: function (value) {
         this.password === value;
       },
-      message: 'the password you provided is different with the password',
+      message: 'password and passwordConfirm are not the same',
     },
   },
   passwordChangedAt: Date,
   image: String,
 });
 
-userSchema.methods.changedPasswordAfter = (tokenInitiatedAt) => {
-  if (this.passwordChangedAt > tokenInitiatedAt) return true;
+userSchema.methods.changedPasswordAfter = (JWTTimestamp) => {
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    console.log(JWTTimestamp, changedTimeStamp);
+    return JWTTimestamp < changedTimeStamp;
+  }
   return false;
 };
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(this.password, candidatePassword);
+  console.log(this);
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 userSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
-
   this.passwordConfirm = undefined;
+  next();
 });
 const User = mongoose.model('User', userSchema);
 

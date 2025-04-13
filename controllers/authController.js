@@ -33,17 +33,16 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 1) check if the emaill and password is provided
   if (!email || !password) {
-    return new Error('Please provide email and password');
+    return next(new AppError('Please provide email and password'));
   }
 
   // 2) check if the user exist and the password is correct
   const user = await User.findOne({ email }).select('+password');
   if (!user && !(await user.comparePassword(password))) {
-    next(new AppError('Invalid email or password', 401));
+    return next(new AppError('Invalid email or password', 401));
   }
 
   // 3) then send the token
-
   const token = signToken(user.id);
   res.status(200).json({
     status: 'sucess',
@@ -65,7 +64,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   if (!token) {
-    next(new AppError('You are not loggedin! Please login', 401));
+    return next(new AppError('You are not loggedin! Please login', 401));
   }
   // 2) Verification token
   const payload = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
@@ -73,7 +72,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   // 3) Check if user still exists
   const user = await User.findOne({ _id: payload.id });
   if (!user)
-    next(
+    return next(
       new AppError('A user associated with this token no longer exist!', 401)
     );
   // 4) Check if user changed password after the token was issued
@@ -85,4 +84,37 @@ exports.protect = catchAsync(async (req, res, next) => {
   // Grant access to the protected route
   req.user = user;
   next();
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) check req.body
+  const { currentPassword, password, passwordConfirm } = req.body;
+
+  if (!currentPassword || !password || !passwordConfirm) {
+    return next(
+      new AppError(
+        'please provide all the inputs"currentPassword, password, passwordConfirm"',
+        400
+      )
+    );
+  }
+  // 2) check the current password with the password in the DB
+  const user = await User.findById(req.user.id).select('+password');
+  console.log(currentPassword);
+  if (!(await user.comparePassword(currentPassword))) {
+    return next(new AppError('Incorrect password!', 401));
+  }
+
+  // 3) update the password
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+
+  await user.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
 });
