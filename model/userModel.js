@@ -48,9 +48,12 @@ userSchema.methods.changedPasswordAfter = (JWTTimestamp) => {
   }
   return false;
 };
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (
+  candidatePassword,
+  userPassword
+) {
   console.log(this);
-  return await bcrypt.compare(candidatePassword, this.password);
+  return await bcrypt.compare(candidatePassword, userPassword);
 };
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password') || this.isNew) return next();

@@ -38,7 +38,8 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 2) check if the user exist and the password is correct
   const user = await User.findOne({ email }).select('+password');
-  if (!user && !(await user.comparePassword(password))) {
+  console.log(user);
+  if (!user && !(await user.comparePassword(password, user.password))) {
     return next(new AppError('Invalid email or password', 401));
   }
 
@@ -101,7 +102,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 2) check the current password with the password in the DB
   const user = await User.findById(req.user.id).select('+password');
   console.log(currentPassword);
-  if (!(await user.comparePassword(currentPassword))) {
+  if (!(await user.comparePassword(currentPassword, user.password))) {
     return next(new AppError('Incorrect password!', 401));
   }
 
