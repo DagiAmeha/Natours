@@ -41,7 +41,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // 2) check if the user exist and the password is correct
   const user = await User.findOne({ email }).select('+password');
   console.log(user);
-  if (!user && !(await user.comparePassword(password, user.password))) {
+  if (user && !(await user.comparePassword(password, user.password))) {
     return next(new AppError('Invalid email or password', 401));
   }
 
@@ -148,6 +148,26 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     text: `Please click on the following link, or paste this into your browser to complete the process:  ${resetURL}
     If you did not request this, please ignore this email and your password will remain unchanged.`,
   });
+
+  res.status(200).json({
+    status: 'success',
+  });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { token } = req.params;
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  const currentUser = await User.findOne({ passwordResetToken: hashedToken });
+
+  if (!currentUser || Date.now() > currentUser.passwordResetExpires) {
+    return next(new AppError('Token is invalid or has expired.', 400));
+  }
+  currentUser.password = req.body.password;
+  currentUser.passwordConfirm = req.body.passwordConfirm;
+  currentUser.passwordResetToken = undefined;
+  currentUser.passwordResetExpires = undefined;
+  await currentUser.save();
 
   res.status(200).json({
     status: 'success',
