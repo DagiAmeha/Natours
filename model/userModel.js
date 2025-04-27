@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     require: [true, 'please confirm your password'],
     validate: {
       validator: function (value) {
-        this.password === value;
+        return this.password === value;
       },
       message: 'password and passwordConfirm are not the same',
     },
@@ -41,7 +41,7 @@ userSchema.methods.changedPasswordAfter = (JWTTimestamp) => {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
-      10
+      10,
     );
     console.log(JWTTimestamp, changedTimeStamp);
     return JWTTimestamp < changedTimeStamp;
@@ -50,7 +50,7 @@ userSchema.methods.changedPasswordAfter = (JWTTimestamp) => {
 };
 userSchema.methods.comparePassword = async function (
   candidatePassword,
-  userPassword
+  userPassword,
 ) {
   console.log(this);
   return await bcrypt.compare(candidatePassword, userPassword);

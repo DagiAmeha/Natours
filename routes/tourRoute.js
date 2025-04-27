@@ -7,13 +7,13 @@ const router = express.Router();
 router.get(
   '/top-5-cheap-tours',
   tourController.aliasTopTours,
-  tourController.getAllTours
+  tourController.getAllTours,
 );
 router.get('/tours-stats', authController.protect, tourController.tourStats);
 router.get(
   '/monthly-plan/:year',
   authController.protect,
-  tourController.getMonthlyPlan
+  tourController.getMonthlyPlan,
 );
 router
   .route('/')

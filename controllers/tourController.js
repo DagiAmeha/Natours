@@ -31,8 +31,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
     next(
       new AppError(
         `Inalid Id: there is no tour with an Id "${req.params.id}`,
-        400
-      )
+        400,
+      ),
     );
 
   res.status(200).json({

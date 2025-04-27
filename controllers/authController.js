@@ -1,7 +1,9 @@
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const transporter = require('../utils/email');
 const User = require('../model/userModel');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
-const jwt = require('jsonwebtoken');
 
 const { promisify } = require('util');
 
@@ -74,12 +76,12 @@ exports.protect = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ _id: payload.id });
   if (!user)
     return next(
-      new AppError('A user associated with this token no longer exist!', 401)
+      new AppError('A user associated with this token no longer exist!', 401),
     );
   // 4) Check if user changed password after the token was issued
   if (user.changedPasswordAfter(payload.iat))
     return next(
-      new AppError('password is recently changed! Please login again.', 401)
+      new AppError('password is recently changed! Please login again.', 401),
     );
 
   // Grant access to the protected route
@@ -95,8 +97,8 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         'please provide all the inputs"currentPassword, password, passwordConfirm"',
-        400
-      )
+        400,
+      ),
     );
   }
   // 2) check the current password with the password in the DB
@@ -117,5 +119,37 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     data: {
       user,
     },
+  });
+});
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email }).select('+password');
+
+  if (!user) {
+    return next(new AppError('There is no user with this email!', 400));
+  }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  user.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  user.passwordResetTokenExpiresIn = 10 * 60 * 1000;
+  await user.save({
+    validateBeforeSave: false,
+  });
+
+  const resetURL = `http://127.0.0.1/users/resetPassword/${token}`;
+  await transporter.sendMail({
+    from: '"Test Sender" <sender@example.com>', // sender address
+    to: user.email, // list of receivers
+    subject: 'Password Reset Request',
+    text: `Please click on the following link, or paste this into your browser to complete the process:  ${resetURL}
+    If you did not request this, please ignore this email and your password will remain unchanged.`,
+  });
+
+  res.status(200).json({
+    status: 'success',
   });
 });
