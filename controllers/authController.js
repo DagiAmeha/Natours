@@ -135,7 +135,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     .createHash('sha256')
     .update(token)
     .digest('hex');
-  user.passwordResetTokenExpiresIn = 10 * 60 * 1000;
+  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   await user.save({
     validateBeforeSave: false,
   });
