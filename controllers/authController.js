@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const transporter = require('../utils/email');
+const sendEmail = require('../utils/email');
 const User = require('../model/userModel');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
@@ -141,17 +141,33 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   });
 
   const resetURL = `http://127.0.0.1/users/resetPassword/${token}`;
-  await transporter.sendMail({
-    from: '"Test Sender" <sender@example.com>', // sender address
-    to: user.email, // list of receivers
-    subject: 'Password Reset Request',
-    text: `Please click on the following link, or paste this into your browser to complete the process:  ${resetURL}
-    If you did not request this, please ignore this email and your password will remain unchanged.`,
-  });
 
-  res.status(200).json({
-    status: 'success',
-  });
+  const message = `Please click on the following link, or paste this into your browser to complete the process:  ${resetURL}
+    If you did not request this, please ignore this email and your password will remain unchanged.`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Request',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email.',
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'There was an error sending the email. Try again later',
+        500,
+      ),
+    );
+  }
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
