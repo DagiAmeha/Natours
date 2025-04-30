@@ -57,6 +57,15 @@ userSchema.methods.comparePassword = async function (
   console.log(this);
   return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+userSchema.methods.updatePassword = async function (req) {
+  this.password = req.body.password;
+  this.passwordConfirm = req.body.passwordConfirm;
+  this.passwordResetToken = undefined;
+  this.passwordResetExpires = undefined;
+  await this.save();
+};
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
