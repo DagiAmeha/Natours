@@ -9,7 +9,7 @@ const validationErrorHandler = (error) => {
 };
 
 const duplicateErrorHandler = (error) => {
-  const message = `Duplcate name for a tour in not allowed /${error.keyValue.name}/`;
+  const message = `Duplcate value in not allowed /${error.keyValue.name}/`;
 
   return new AppError(message, 400);
 };
