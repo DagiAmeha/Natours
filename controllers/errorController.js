@@ -9,7 +9,9 @@ const validationErrorHandler = (error) => {
 };
 
 const duplicateErrorHandler = (error) => {
-  const message = `Duplcate value in not allowed /${error.keyValue.name}/`;
+  const field = Object.keys(error.keyValue)[0];
+  const value = error.keyValue[field];
+  const message = `Duplicate value '${value}' for field '${field}' is not allowed.`;
 
   return new AppError(message, 400);
 };
