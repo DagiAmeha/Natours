@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'user',
   },
+  active: {
+    type: Boolean,
+    default: true,
+  },
   password: {
     type: String,
     required: [true, 'please provide a password'],
@@ -77,6 +81,11 @@ userSchema.pre('save', async function (next) {
 
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre(/^find/, async function (next) {
+  this.find({ active: true });
   next();
 });
 const User = mongoose.model('User', userSchema);

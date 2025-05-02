@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const tourRoute = require('./routes/tourRoute');
 const userRoute = require('./routes/userRoute');
 const { globalErrorHandler } = require('./controllers/errorController');
+const AppError = require('./utils/AppError');
 
 const app = express();
 
@@ -47,7 +48,7 @@ app.use(
       'difficulty',
       'price',
     ],
-  })
+  }),
 );
 
 app.use(express.json());
