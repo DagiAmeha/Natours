@@ -41,18 +41,30 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllUsers = async (req, res, next) => {
-  res.status(500).json({
-    statsu: 'error',
-    message: 'This route is not yet definded',
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find();
+
+  res.status(200).json({
+    statsu: 'success',
+    length: users.length,
+    data: {
+      users,
+    },
   });
-};
-exports.getUser = async (req, res, next) => {
-  res.status(500).json({
-    statsu: 'error',
-    message: 'This route is not yet definded',
+});
+exports.getUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError('No user found with this id', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
   });
-};
+});
 exports.createNewUser = async (req, res, next) => {
   res.status(500).json({
     statsu: 'error',

@@ -40,7 +40,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // 2) check if the user exist and the password is correct
   const user = await User.findOne({ email }).select('+password');
   console.log(user);
-  if (user && !(await user.comparePassword(password, user.password))) {
+  if (!user || !(await user.comparePassword(password, user.password))) {
     return next(new AppError('Invalid email or password', 401));
   }
 
@@ -88,6 +88,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.protectTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You are not allowed to perform this action', 403),
+      );
+    }
+    next();
+  };
+};
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) check req.body
   const { currentPassword, password, passwordConfirm } = req.body;
