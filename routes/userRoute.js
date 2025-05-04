@@ -33,7 +33,15 @@ router
     authController.protectTo('admin', 'lead-guide'),
     userController.getUser,
   )
-  .patch()
-  .delete();
+  .patch(
+    authController.protect,
+    authController.protectTo('admin', 'lead-guide'),
+    userController.updateUser,
+  )
+  .delete(
+    authController.protect,
+    authController.protectTo('admin', 'lead-guide'),
+    userController.deleteUser,
+  );
 
 module.exports = router;
