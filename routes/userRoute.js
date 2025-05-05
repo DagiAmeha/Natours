@@ -28,20 +28,9 @@ router
 
 router
   .route('/:id')
-  .get(
-    authController.protect,
-    authController.protectTo('admin', 'lead-guide'),
-    userController.getUser,
-  )
-  .patch(
-    authController.protect,
-    authController.protectTo('admin', 'lead-guide'),
-    userController.updateUser,
-  )
-  .delete(
-    authController.protect,
-    authController.protectTo('admin', 'lead-guide'),
-    userController.deleteUser,
-  );
+  .all(authController.protect, authController.protectTo('admin', 'lead-guide'))
+  .get(userController.getUser)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;
