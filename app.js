@@ -8,6 +8,7 @@ const morgan = require('morgan');
 
 const tourRoute = require('./routes/tourRoute');
 const userRoute = require('./routes/userRoute');
+const reviewRoute = require('./routes/reviewRoute');
 const { globalErrorHandler } = require('./controllers/errorController');
 const AppError = require('./utils/AppError');
 
@@ -57,6 +58,7 @@ app.use(express.static('public'));
 // Route Handlers
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 // handling Route that are not defined in our api
 app.all('*', (req, res, next) => {
