@@ -11,7 +11,11 @@ exports.setTourUserIds = (req, res, next) => {
 };
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  const filterObj = {};
+  if (req.params.tourId) {
+    filterObj.tour = req.params.tourId;
+  }
+  const reviews = await Review.find(filterObj);
 
   res.status(200).json({
     statsu: 'success',
