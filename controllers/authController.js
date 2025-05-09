@@ -11,6 +11,22 @@ const signToken = (userId) => {
     expiresIn: process.env.EXPIRES_IN * 24 * 60 * 60 * 1000,
   });
 };
+
+const createAndSendToken = (res, user) => {
+  const token = signToken(user.id);
+
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    expiresIn: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+  });
+  res.status(200).json({
+    status: 'sucess',
+    token,
+    data: {
+      user,
+    },
+  });
+};
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.create({
     name: req.body.name,
@@ -19,15 +35,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(user.id);
-
-  res.status(200).json({
-    status: 'sucess',
-    token,
-    data: {
-      user,
-    },
-  });
+  createAndSendToken(res, user);
 });
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -45,14 +53,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) then send the token
-  const token = signToken(user.id);
-  res.status(200).json({
-    status: 'sucess',
-    token,
-    data: {
-      user,
-    },
-  });
+  createAndSendToken(res, user);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

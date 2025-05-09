@@ -14,7 +14,8 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
     .filter()
     .sort()
     .limitFields()
-    .paginate().query;
+    .paginate()
+    .query.populate({ path: 'guides', select: 'name' });
 
   res.status(200).json({
     status: 'success',
@@ -25,7 +26,10 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   });
 });
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.find({ _id: req.params.id });
+  const tour = await Tour.find({ _id: req.params.id }).populate({
+    path: 'guides',
+    select: 'name photo',
+  });
 
   if (tour.length === 0)
     next(

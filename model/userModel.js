@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: [validator.isEmail, 'Email is not in the right format'],
   },
+  photo: {
+    type: String,
+    default: 'default.jpg',
+  },
   role: {
     type: String,
     default: 'user',

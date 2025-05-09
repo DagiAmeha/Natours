@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema({
   name: {
@@ -34,6 +35,36 @@ const tourSchema = new mongoose.Schema({
     required: [true, 'a tour must have a imageCover'],
   },
   images: [String],
+  startLocation: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  },
+  locations: [
+    {
+      type: {
+        type: String,
+        enum: ['Point'],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
+  ],
+  guides: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+    },
+  ],
   startDates: [Date],
   createdAt: {
     type: Date,
