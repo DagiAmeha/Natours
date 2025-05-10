@@ -72,5 +72,11 @@ const tourSchema = new mongoose.Schema({
   },
 });
 
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: 'name photo',
+  });
+});
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;

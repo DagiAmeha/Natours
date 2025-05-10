@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const User = require('../model/userModel');
+const factory = require('./handlerFactory');
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
@@ -52,19 +53,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-
-  if (!user) {
-    return next(new AppError('No user found with this id', 404));
-  }
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user,
-    },
-  });
-});
+exports.getUser = factory.getOne(User);
 exports.createNewUser = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
