@@ -15,8 +15,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
     .filter()
     .sort()
     .limitFields()
-    .paginate()
-    .query.populate({ path: 'guides', select: 'name' });
+    .paginate().query;
 
   res.status(200).json({
     status: 'success',
@@ -36,29 +35,8 @@ exports.createNewTour = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, {
-    new: true,
-  });
-
-  if (tour.length === 0)
-    throw new Error(`Inalid Id: there is no tour with an Id ${req.params.id}`);
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.tourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([

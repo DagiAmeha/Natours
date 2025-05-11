@@ -65,29 +65,5 @@ exports.createNewUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateUser = catchAsync(async (req, res, next) => {
-  const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedUser) {
-    return next(new AppError('No user found with this id', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user: updatedUser,
-    },
-  });
-});
-
-exports.deleteUser = catchAsync(async (req, res, next) => {
-  await User.findByIdAndDelete(req.params.id);
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);

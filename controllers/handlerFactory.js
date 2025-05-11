@@ -16,3 +16,34 @@ exports.getOne = (Model) => {
     });
   });
 };
+
+exports.updateOne = (Model) => {
+  return catchAsync(async (req, res, next) => {
+    const updatedDoc = await Model.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedDoc) {
+      return next(new AppError('No document found with this id', 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        doc: updatedDoc,
+      },
+    });
+  });
+};
+
+exports.deleteOne = (Model) => {
+  return catchAsync(async (req, res, next) => {
+    await Model.findByIdAndDelete(req.params.id);
+
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  });
+};
