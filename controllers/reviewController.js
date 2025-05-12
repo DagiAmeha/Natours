@@ -27,19 +27,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 exports.getReview = factory.getOne(Review);
-exports.createReview = catchAsync(async (req, res, next) => {
-  const { review, rating, tour, user } = req.body;
-
-  const newReview = await Review.create({ review, rating, tour, user });
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review: newReview,
-    },
-  });
-});
-
+exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 
 exports.deleteReview = factory.deleteOne(Review);

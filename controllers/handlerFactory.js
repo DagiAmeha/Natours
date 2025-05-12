@@ -17,6 +17,18 @@ exports.getOne = (Model) => {
   });
 };
 
+exports.createOne = (Model) => {
+  return catchAsync(async (req, res, next) => {
+    const newDoc = await Model.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        doc: newDoc,
+      },
+    });
+  });
+};
 exports.updateOne = (Model) => {
   return catchAsync(async (req, res, next) => {
     const updatedDoc = await Model.findByIdAndUpdate(req.params.id, req.body, {

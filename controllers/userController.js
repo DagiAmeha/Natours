@@ -54,16 +54,6 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 exports.getUser = factory.getOne(User);
-exports.createNewUser = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      user: newUser,
-    },
-  });
-});
-
+exports.createNewUser = factory.createOne(User);
 exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
