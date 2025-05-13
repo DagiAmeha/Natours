@@ -1,5 +1,28 @@
 const AppError = require('../utils/appError');
+const ApiFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+
+exports.getAll = (Model) => {
+  return async (req, res, next) => {
+    const filterObj = {};
+    if (req.params.tourId) {
+      filterObj.tour = req.params.tourId;
+    }
+    const doc = await new ApiFeatures(Model.find(filterObj), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate().query;
+
+    res.status(200).json({
+      status: 'success',
+      length: doc.length,
+      data: {
+        doc,
+      },
+    });
+  };
+};
 
 exports.getOne = (Model) => {
   return catchAsync(async (req, res, next) => {

@@ -42,17 +42,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    statsu: 'success',
-    length: users.length,
-    data: {
-      users,
-    },
-  });
-});
+exports.getAllUsers = factory.getAll(User);
 exports.getUser = factory.getOne(User);
 exports.createNewUser = factory.createOne(User);
 exports.updateUser = factory.updateOne(User);

@@ -77,6 +77,7 @@ tourSchema.pre(/^find/, function (next) {
     path: 'guides',
     select: 'name photo',
   });
+  next();
 });
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
