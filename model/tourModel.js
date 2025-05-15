@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./userModel');
+const Review = require('./reviewModel');
 
 const tourSchema = new mongoose.Schema({
   name: {
@@ -75,10 +76,20 @@ const tourSchema = new mongoose.Schema({
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
 
+tourSchema.virtual('durationWeeks').get(function () {
+  return this.duration / 7;
+});
+
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guides',
-    select: 'name photo',
+    select: '-active -passwordChangedAt -__v',
   });
   next();
 });
