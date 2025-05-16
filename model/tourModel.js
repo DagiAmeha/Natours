@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 const User = require('./userModel');
 const Review = require('./reviewModel');
 
@@ -9,6 +10,7 @@ const tourSchema = new mongoose.Schema({
     unique: true,
     minLength: [10, 'a tour must have a minimun of 10 character'],
   },
+  slug: String,
   duration: Number,
   maxGroupSize: Number,
   difficulty: {
@@ -86,6 +88,10 @@ tourSchema.virtual('reviews', {
   localField: '_id',
 });
 
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guides',
