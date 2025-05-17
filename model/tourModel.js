@@ -69,6 +69,10 @@ const tourSchema = new mongoose.Schema({
     },
   ],
   startDates: [Date],
+  secretTour: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -97,6 +101,10 @@ tourSchema.pre(/^find/, function (next) {
     path: 'guides',
     select: '-active -passwordChangedAt -__v',
   });
+  next();
+});
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
   next();
 });
 const Tour = mongoose.model('Tour', tourSchema);
